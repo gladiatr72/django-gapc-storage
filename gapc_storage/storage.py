@@ -57,23 +57,6 @@ def safe_join(base, *paths):
     return final_path.lstrip("/")
 
 
-def _gcs_file_storage_settings():
-    config = getattr(settings, "GAPC_STORAGE", {})
-
-    def default_bucket():
-        try:
-            return os.environ["GCS_BUCKET"]
-        except KeyError:
-            raise ImproperlyConfigured("Either GAPC_STORAGE[bucket] or env var GCS_BUCKET need to be set.")
-
-    config.setdefault("allow_overwrite", False)
-    config.setdefault("bucket", SimpleLazyObject(default_bucket))
-    config.setdefault("cache_control", GCS_PUBLIC_READ_CACHE_DEFAULT)
-    config.setdefault("path_prefix", "")
-    config.setdefault("num_retries", 0)
-
-    return config
-
 
 class GCSFile(File):
     """
@@ -98,13 +81,38 @@ class GoogleCloudStorage(Storage):
     makes no assumptions about your environment and can be used anywhere.
     """
 
+    name = 'GCS'
+
     def __init__(self):
         self.thread = threading.local()
-        config = _gcs_file_storage_settings()
+        config = self._gcs_file_storage_settings()
+        self.config = config
         self.bucket = config["bucket"]
         self.path_prefix = self.path_prefix if hasattr(self, "path_prefix") else config["path_prefix"]
         self.allow_overwrite = self.allow_overwrite if hasattr(self, "allow_overwrite") else config["allow_overwrite"]
         self.cache_control = self.cache_control if hasattr(self, "cache_control") else config["cache_control"]
+
+    def _gcs_file_storage_settings(self):
+        config_env = "GAPC_{}_STORAGE".format(self.name.upper())
+        bucket_env = "GCS_{}_BUCKET".format(self.name.upper())
+        config = getattr(settings, config_env, {})
+
+        def default_bucket():
+            try:
+                return os.environ[bucket_env]
+            except KeyError:
+                raise ImproperlyConfigured(
+                    "Either {}[bucket] or env var {} need to be set.".format(
+                        config_env, bucket_env
+                    ))
+
+        config.setdefault("allow_overwrite", False)
+        config.setdefault("bucket", SimpleLazyObject(default_bucket))
+        config.setdefault("cache_control", GCS_PUBLIC_READ_CACHE_DEFAULT)
+        config.setdefault("path_prefix", "")
+        config.setdefault("num_retries", 0)
+
+        return config
 
     def build_client(self):
         credentials = self.get_oauth_credentials()
@@ -133,13 +141,16 @@ class GoogleCloudStorage(Storage):
         return safe_join(self.path_prefix, name)
 
     def get_gcs_object(self, name, ensure=True):
-        req = self.client.objects().get(bucket=self.bucket, object=self._prefixed_name(name))
+        req = self.client.objects().get(bucket=self.bucket,
+                                        object=self._prefixed_name(name))
         try:
-            return req.execute(num_retries=self.num_retries)
+            return req.execute(num_retries=self.config['num_retries'])
         except HttpError as exc:
             if exc.resp["status"] == "404":
                 if ensure:
-                    raise IOError('object "{}/{}" does not exist'.format(self.bucket, self._prefixed_name(name)))
+                    raise IOError('object "{}/{}" does not exist'.format(
+                        self.bucket,
+                        self._prefixed_name(name)))
                 else:
                     return None
             raise
@@ -162,10 +173,11 @@ class GoogleCloudStorage(Storage):
         done = False
         try:
             while not done:
-                done = media.next_chunk(num_retries=self.num_retries)[1]
+                done = media.next_chunk(num_retries=self.config['num_retries'])[1]
         except HttpError as exc:
             if exc.resp["status"] == "404":
-                raise IOError('object "{}/{}" does not exist'.format(self.bucket, self._prefixed_name(name)))
+                raise IOError('object "{}/{}" does not exist'.format(
+                    self.bucket, self._prefixed_name(name)))
             else:
                 raise IOError("unknown HTTP error: {}".format(exc))
         buf.seek(0)
@@ -184,13 +196,13 @@ class GoogleCloudStorage(Storage):
             },
             media_body=media
         )
-        req.execute(num_retries=self.num_retries)
+        req.execute(num_retries=self.config['num_retries'])
         return name
 
     def delete(self, name):
         req = self.client.objects().delete(bucket=self.bucket, object=self._prefixed_name(name))
         try:
-            return req.execute(num_retries=self.num_retries)
+            return req.execute(num_retries=self.config['num_retries'])
         except HttpError as exc:
             if exc.resp["status"] == "404":
                 return
@@ -203,7 +215,7 @@ class GoogleCloudStorage(Storage):
         return int(self.get_gcs_object(name)["size"])
 
     def url(self, name):
-        url_template = _gcs_file_storage_settings().get(
+        url_template = self._gcs_file_storage_settings().get(
             "url-template",
             "https://storage.googleapis.com/{bucket}/{name}"
         )
@@ -212,10 +224,12 @@ class GoogleCloudStorage(Storage):
         return "{}://{}".format(scheme, urlquote(rest))
 
     def created_time(self, name):
-        return dateutil.parser.parse(self.get_gcs_object(name)["timeCreated"])
+        return dateutil.parser.parse(self.get_gcs_object(name)["timeCreated"],
+                                     ignoretz=True)
 
     def modified_time(self, name):
-        return dateutil.parser.parse(self.get_gcs_object(name)["updated"])
+        return dateutil.parser.parse(self.get_gcs_object(name)["updated"],
+                                     ignoretz=True)
 
     def get_available_name(self, name, max_length=None):
         if self.allow_overwrite:
