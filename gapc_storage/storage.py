@@ -81,7 +81,7 @@ class GoogleCloudStorage(Storage):
     makes no assumptions about your environment and can be used anywhere.
     """
 
-    name = 'GCS'
+    name = None
 
     def __init__(self):
         self.thread = threading.local()
@@ -98,13 +98,17 @@ class GoogleCloudStorage(Storage):
         config = getattr(settings, config_env, {})
 
         def default_bucket():
-            try:
-                return os.environ[bucket_env]
-            except KeyError:
+            retval = os.environ.get(bucket_env,
+                                    getattr(settings, bucket_env, 'None')
+                                    )
+
+            if not retval:
                 raise ImproperlyConfigured(
                     "Either {}[bucket] or env var {} need to be set.".format(
                         config_env, bucket_env
                     ))
+
+            return retval
 
         config.setdefault("allow_overwrite", False)
         config.setdefault("bucket", SimpleLazyObject(default_bucket))
