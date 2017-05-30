@@ -1,9 +1,7 @@
-=========================================
-(Google Cloud Storage) Storage for Django
-=========================================
 
-django-gapc-storage
--------------------
+# (Google Cloud Storage) Storage for Django
+
+## django-gapc-storage
 
 `django-gapc-storage` is a Django storage backend for Google Cloud Storage
 using the JSON API through google-api-python-client. This is forked from [django-gapc-storage](https://github.com/eldarion/django-gapc-storage).
@@ -22,16 +20,14 @@ Enhancements:
 * properly casts naive dates to conform to Django's expectations
 
 
-Requirements
---------------
+## Requirements
 
 * Django 1.8+
 * a GCP service account
 * one or two GCS buckets
 
 
-Configure a Service Account
----------------------------
+## Configure a Service Account
 
 From the GCP web console: `IAM & Admin` -> `Service Accounts`, `Create Service Account`, give it a name; finally:  `Create`.
 
@@ -63,8 +59,7 @@ This library accounts for this JSON string being passed in the GCS_CREDENTIALS e
 targetting Kubernetes for deployments; base64 is automatically decoded when it is encountered as a value within its
 secrets store. For local work: ```export GCS_CREDENTIALS="$( cat /path/to/keyfile.json)"```
 
-Knobs and Switches
-------------------
+## Knobs and Switches
 
  * Django settings only
    * GAPC_STATIC_STORAGE
@@ -76,8 +71,7 @@ Knobs and Switches
    * GCS_CREDENTIALS
 
 
-GAPC_[]_STORAGE
-:::::::::::::::
+### GAPC_[]_STORAGE
 
 Modify This library's defaults:
 
@@ -91,22 +85,18 @@ GAPC_[]_STORAGE = {
     }
 ```
 
-allow_overwrite
-+++++++++++++++
-
+#### allow_overwrite
 
 Default: `False`
 
 If `True`, the storage backend will overwrite an existing object with
 the same name.
 
-bucket
-++++++
+#### bucket
 
 Default: `os.environ["GCS_[]_BUCKET"]`
 
-cache_control
-+++++++++++++
+#### cache_control
 
 Default: `public, max-age=3600`
 
@@ -114,8 +104,7 @@ By default, public-readable objects on GCS have a cache duration of 60
 minutes.  Set `cache_control` to `private, max-age=0` to disable
 public caching of objects saved by the storage backend.
 
-num_retries
-+++++++++++
+#### num_retries
 
 Default: `0`
 
@@ -123,8 +112,7 @@ Passed to the supported methods on the underlying google-api-python-client clien
 
 For more information, see the [google-api-python-client documetation](http://google.github.io/google-api-python-client/docs/epy/googleapiclient.http.HttpRequest-class.html#execute
 
-path_prefix
-+++++++++++
+#### path_prefix
 
 Default: `""`
 
@@ -133,35 +121,29 @@ For example, configuring path_prefix to `media` would save
 objects to `my-bucket/media`.
 
 
-GCS_[]_BUCKET
-:::::::::::::
+### GCS_[]_BUCKET
 
 The name of the static/media GCS buckets
 
 
-GCS_CREDENTIALS
-:::::::::::::::
+### GCS_CREDENTIALS
 
 (See the Service Account section for details)
 
-Permissions
-:::::::::::
+### Permissions
 
-bucket permissions
-++++++++++++++++++
+#### bucket permissions
 
 * Add a new *user* ACL for the service account user (e.g.: `throw-away@thisn-000000.iam.gserviceaccount.com`
 
 
-default object permissions
-++++++++++++++++++++++++++
+#### default object permissions
 
 * Add a new *user* ACL for the service account user (e.g.: `throw-away@thisn-000000.iam.gserviceaccount.com`)
 * Add a new *user* ACL for the special `allUsers` target (aka: anonymous) user. Assign the 'Reader' role.
 
 
-GCS Bucket CORS Configuration
-:::::::::::::::::::::::::::::
+### GCS Bucket CORS Configuration
 
 For non-programmatic manipulation of GCS buckets use the [gsutil](https://cloud.google.com/storage/docs/gsutil_install) utility.
 
