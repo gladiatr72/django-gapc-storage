@@ -40,20 +40,20 @@ line menu. `django-gapc-storage` accounts for `json` formatted private key struc
 
 On key creation, an account specific private key is returned structured thusly (as of 5/30/2017):
 
-```
+```json
 
-{
-  "type": "service_account",
-  "project_id": "thisn-000000",
-  "private_key_id": "3d8a143d635e885350398e5a29385fe0e2f0297f",
-  "private_key": "-----BEGIN PRIVATE KEY----- >>[[bits]]<< -----END PRIVATE KEY-----\n",
-  "client_email": "throw-away@thisn-000000.iam.gserviceaccount.com",
-  "client_id": "000000000000000000000",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://accounts.google.com/o/oauth2/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/throw-away%40thisn-000000.iam.gserviceaccount.com"
-}
+    {
+      "type": "service_account",
+      "project_id": "thisn-000000",
+      "private_key_id": "3d8a143d635e885350398e5a29385fe0e2f0297f",
+      "private_key": "-----BEGIN PRIVATE KEY----- >>[[bits]]<< -----END PRIVATE KEY-----\n",
+      "client_email": "throw-away@thisn-000000.iam.gserviceaccount.com",
+      "client_id": "000000000000000000000",
+      "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+      "token_uri": "https://accounts.google.com/o/oauth2/token",
+      "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+      "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/throw-away%40thisn-000000.iam.gserviceaccount.com"
+    }
 
 ```
 
@@ -81,7 +81,7 @@ GAPC_[]_STORAGE
 
 Modify This library's defaults:
 
-``
+```python
 GAPC_[]_STORAGE = {
         "allow_overwrite": False,
         "bucket": "my-bucket",
@@ -89,7 +89,7 @@ GAPC_[]_STORAGE = {
         "num_retries": 0,
         "path_prefix": "",
     }
-``
+```
 
 allow_overwrite
 +++++++++++++++
@@ -150,14 +150,14 @@ Permissions
 bucket permissions
 ++++++++++++++++++
 
- * Add a new *user* ACL for the service account user (e.g.: `throw-away@thisn-000000.iam.gserviceaccount.com`
+* Add a new *user* ACL for the service account user (e.g.: `throw-away@thisn-000000.iam.gserviceaccount.com`
 
 
 default object permissions
 ++++++++++++++++++++++++++
 
- * Add a new *user* ACL for the service account user (e.g.: `throw-away@thisn-000000.iam.gserviceaccount.com`)
- * Add a new *user* ACL for the special `allUsers` target (aka: anonymous) user. Assign the 'Reader' role.
+* Add a new *user* ACL for the service account user (e.g.: `throw-away@thisn-000000.iam.gserviceaccount.com`)
+* Add a new *user* ACL for the special `allUsers` target (aka: anonymous) user. Assign the 'Reader' role.
 
 
 GCS Bucket CORS Configuration
@@ -168,7 +168,7 @@ For non-programmatic manipulation of GCS buckets use the [gsutil](https://cloud.
 A basic CORS configuration looks like:
 
 
-```
+```json
 [
   {
     "origin": ["https://this.domain.tld"],
