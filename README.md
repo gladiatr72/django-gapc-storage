@@ -64,12 +64,23 @@ secrets store. For local work: ```export GCS_CREDENTIALS="$( cat /path/to/keyfil
  * Django settings only
    * GAPC_STATIC_STORAGE
    * GAPC_MEDIA_STORAGE
+   * DEFAULT_FILE_STORAGE
+   * STATICFILES_STORAGE
  * Environment or Django settings
    * GCS_STATIC_BUCKET
    * GCS_MEDIA_BUCKET
  * Environment Only
    * GCS_CREDENTIALS
 
+
+
+### DEFAULT_FILE_STORAGE
+
+set to the string, `gapc_storage.media.Storage`
+
+### STATICFILES_STORAGE
+
+set to the string, `gapc_storage.static.Storage`
 
 ### GAPC_[]_STORAGE
 
