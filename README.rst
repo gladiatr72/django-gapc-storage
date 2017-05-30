@@ -6,7 +6,7 @@ django-gapc-storage
 -------------------
 
 `django-gapc-storage` is a Django storage backend for Google Cloud Storage
-using the JSON API through google-api-python-client. This is forked from [eldarion/django-gapc-storage](https://github.com/eldarion/django-gapc-storage).
+using the JSON API through google-api-python-client. This is forked from [django-gapc-storage](https://github.com/eldarion/django-gapc-storage).
 
 ------
 
@@ -40,7 +40,7 @@ line menu. `django-gapc-storage` accounts for `json` formatted private key struc
 
 On key creation, an account specific private key is returned structured thusly (as of 5/30/2017):
 
-``
+```
 
 {
   "type": "service_account",
@@ -55,25 +55,25 @@ On key creation, an account specific private key is returned structured thusly (
   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/throw-away%40thisn-000000.iam.gserviceaccount.com"
 }
 
-``
+```
 
 This library accounts for this JSON string being passed in the GCS_CREDENTIALS environment variable.
 
 *NOTE*: Feeding base64-encoded JSON via this variable will fail. We are currently
 targetting Kubernetes for deployments; base64 is automatically decoded when it is encountered as a value within its
-secrets store. For local work: `export GCS_CREDENTIALS="$( cat /path/to/keyfile.json)"`
+secrets store. For local work: ```export GCS_CREDENTIALS="$( cat /path/to/keyfile.json)"```
 
 Knobs and Switches
 ------------------
 
  * Django settings only
-   + GAPC_STATIC_STORAGE
-   + GAPC_MEDIA_STORAGE
+   * GAPC_STATIC_STORAGE
+   * GAPC_MEDIA_STORAGE
  * Environment or Django settings
-   + GCS_STATIC_BUCKET
-   + GCS_MEDIA_BUCKET
+   * GCS_STATIC_BUCKET
+   * GCS_MEDIA_BUCKET
  * Environment Only
-   + GCS_CREDENTIALS
+   * GCS_CREDENTIALS
 
 
 GAPC_[]_STORAGE
@@ -92,7 +92,8 @@ GAPC_[]_STORAGE = {
 ``
 
 allow_overwrite
--=-=-=-=-=-=-=-
++++++++++++++++
+
 
 Default: `False`
 
@@ -100,12 +101,12 @@ If `True`, the storage backend will overwrite an existing object with
 the same name.
 
 bucket
--=-=-=
+++++++
 
 Default: `os.environ["GCS_[]_BUCKET"]`
 
 cache_control
--=-=-=-=-=-=-
++++++++++++++
 
 Default: `public, max-age=3600`
 
@@ -114,7 +115,7 @@ minutes.  Set `cache_control` to `private, max-age=0` to disable
 public caching of objects saved by the storage backend.
 
 num_retries
--=-=-=-=-=-
++++++++++++
 
 Default: `0`
 
@@ -123,7 +124,7 @@ Passed to the supported methods on the underlying google-api-python-client clien
 For more information, see the [google-api-python-client documetation](http://google.github.io/google-api-python-client/docs/epy/googleapiclient.http.HttpRequest-class.html#execute
 
 path_prefix
--=-=-=-=-=-
++++++++++++
 
 Default: `""`
 
@@ -147,13 +148,13 @@ Permissions
 :::::::::::
 
 bucket permissions
--=-=-=-=-=-=-=-=-=
+++++++++++++++++++
 
  * Add a new *user* ACL for the service account user (e.g.: `throw-away@thisn-000000.iam.gserviceaccount.com`
 
 
 default object permissions
--=-=-=-=-=-=-=-=-=-=-=-=-=
+++++++++++++++++++++++++++
 
  * Add a new *user* ACL for the service account user (e.g.: `throw-away@thisn-000000.iam.gserviceaccount.com`)
  * Add a new *user* ACL for the special `allUsers` target (aka: anonymous) user. Assign the 'Reader' role.
