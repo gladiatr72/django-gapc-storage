@@ -31,11 +31,11 @@ class Storage(GoogleCloudStorage):
     def get_oauth_credentials(self):
         try:
             client_credentials = json.loads(base64.b64decode(os.environ["GCS_CREDENTIALS"]))
-        except TypeError:
+        except TypeError, KeyError:
             try:
                 client_credentials = json.loads(os.environ["GCS_CREDENTIALS"])
             except KeyError:
-                raise KeyError('GCS_CREDENTIALS env variable not set')
+                raise KeyError('GCS_CREDENTIALS env variable not set or unparseable')
 
         if client_credentials["type"] == SERVICE_ACCOUNT:
             creds = ServiceAccountCredentials.from_json_keyfile_dict(client_credentials)
