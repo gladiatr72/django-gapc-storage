@@ -38,7 +38,7 @@ From the GCP web console: `IAM & Admin` -> `Service Accounts`, `Create Service A
 A new account will have no keys. Keys are created, deleted or renamed from the
 line menu. `django-gapc-storage` accounts for `json` formatted private key structures.
 
-On key creation, an account specific private key is returned structured thusly (as of 5/30/2017):
+On key creation, an account specific private key is returned structured thusly (as of 5/30/2017)
 
 ```json
 
