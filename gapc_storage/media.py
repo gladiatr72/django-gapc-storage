@@ -31,7 +31,7 @@ class Storage(GoogleCloudStorage):
     def get_oauth_credentials(self):
         try:
             client_credentials = json.loads(base64.b64decode(os.environ["GCS_CREDENTIALS"]))
-        except TypeError, KeyError:
+        except (TypeError, KeyError):
             try:
                 client_credentials = json.loads(os.environ["GCS_CREDENTIALS"])
             except KeyError:
