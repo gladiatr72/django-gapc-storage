@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="django-gapc-storage",
-    version="0.4.4",
+    version="0.4.6",
     author="Eldarion, Inc.",
     author_email="development@eldarion.com",
     description="a Django storage backend using GCS JSON API",
@@ -12,7 +12,7 @@ setup(
     url="http://github.com/eldarion/django-gapc-storage",
     packages=find_packages(),
     install_requires=[
-        "google-api-python-client>=1.5.0",
+        "google-api-python-client>=1.5.0,<=1.7",
         "oauth2client",
         "python-dateutil",
     ],

@@ -91,6 +91,7 @@ class GoogleCloudStorage(Storage):
         self.path_prefix = self.path_prefix if hasattr(self, "path_prefix") else config["path_prefix"]
         self.allow_overwrite = self.allow_overwrite if hasattr(self, "allow_overwrite") else config["allow_overwrite"]
         self.cache_control = self.cache_control if hasattr(self, "cache_control") else config["cache_control"]
+        self.num_retries = self.num_retries if hasattr(self, "num_retries") else config["num_retries"]
 
     def _gcs_file_storage_settings(self):
         config_env = "GAPC_{}_STORAGE".format(self.name.upper())
